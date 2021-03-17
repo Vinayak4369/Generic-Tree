@@ -1,0 +1,73 @@
+import java.util.*;
+public class MyClass {
+    
+    static class Node{
+        int value;
+        ArrayList<Node> children = new ArrayList<>();
+        Node(int value){
+            this.value = value;
+        }
+    }
+    
+    public static Node root = null;
+    
+    public static void build(ArrayList<Integer> nodes){
+        Stack<Node> s = new Stack<>();
+        root = new Node(nodes.get(0));
+        s.push(root);
+        int i=1;
+        while(!s.empty()){
+            if(nodes.get(i)==-1)
+                s.pop();
+            else{
+                Node a = new Node(nodes.get(i));
+                s.peek().children.add(a);
+                s.push(a);
+            }
+            i++;
+        }
+    }
+    
+    public static void levelOrderLineWise(Node root){
+        Queue<Node> line = new LinkedList<>();
+        Queue<Node> children = new LinkedList<>();
+        line.add(root);
+        while(line.size()!=0){
+            for(Node a : line){
+                System.out.print(a.value+" ");
+                for(Node b : a.children)
+                    children.add(b);
+            }
+            line = children;
+            children = new LinkedList<>();
+            System.out.println();
+        }
+    }
+    
+    public static void removeLeaves(Node root){
+        for(int i=root.children.size()-1; i>=0; i--){
+            Node a = root.children.get(i);
+            if(a.children.size()==0)
+                root.children.remove(a);
+        }
+        
+        for(Node child : root.children)
+            removeLeaves(child);
+    }
+    
+    public static void main(String args[]) {
+        ArrayList<Integer> nodes = new ArrayList<>();
+        Scanner sc = new Scanner(System.in);
+        while(true){
+            try{
+                nodes.add(sc.nextInt());
+            }catch(Exception e){
+                break;
+            }
+        }
+        build(nodes);
+        removeLeaves(root);
+        levelOrderLineWise(root);
+    }
+    
+}
