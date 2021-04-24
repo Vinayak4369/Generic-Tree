@@ -1,0 +1,96 @@
+import java.util.*;
+public class MyClass {
+    
+    static class Node{
+        int value;
+        ArrayList<Node> children = new ArrayList<>();
+        Node(int value){
+            this.value = value;
+        }
+    }
+    
+    public static Node root = null;
+    
+    public static void build(ArrayList<Integer> nodes){
+        Stack<Node> s = new Stack<>();
+        root = new Node(nodes.get(0));
+        s.push(root);
+        int i=1;
+        while(!s.empty()){
+            if(nodes.get(i)==-1)
+                s.pop();
+            else{
+                Node a = new Node(nodes.get(i));
+                s.peek().children.add(a);
+                s.push(a);
+            }
+            i++;
+        }
+    }
+    
+    public static ArrayList<Integer> nodeToRoot(Node root, int data){
+        if(root.value==data){
+            ArrayList<Integer> l = new ArrayList<>();
+            l.add(data);
+            return l;
+        }
+        for(Node child : root.children){
+            ArrayList<Integer> ntp = nodeToRoot(child,data);
+            if(ntp.size()>0){
+                ntp.add(root.value);
+                return ntp;
+            }
+        }
+        return new ArrayList<>();
+    }
+    
+    public static int distanceBetweenNode(Node root, int a, int b){
+        ArrayList<Integer> p1 = nodeToRoot(root,a);
+        ArrayList<Integer> p2 = nodeToRoot(root,b);
+        int n = Math.min(p1.size(),p2.size());
+        int commonAncestorIndexP1 = -1, commonAncestorIndexP2 = -1;
+        for(int i=1;i<n;i++){
+            if(p1.get(p1.size()-1-i)!=p2.get(p2.size()-1-i)){
+                commonAncestorIndexP1 = p1.size()-i; //It will save the index of commonAncestor in p1 list which shows the elements coming before it
+                commonAncestorIndexP2 = p2.size()-i; //It will save the index of commonAncestor in p2 list which shows the elements coming before it
+                break;                               //[110 , 80 , 30 , 10]
+            }                                        //  0     1    2    3          commonAncestorIndex is 2 (which is the elements coming before it)
+        }                                            //[      70 , 30 , 10]
+                                                     //        0    1    2          commonAncestorIndex is 1 (which is the elements coming before it)
+                                                     // total elemts between 110 and 70 are 2 + 1 = 3
+                                                     // Input = 10 20 50 -1 60 -1 -1 30 70 -1 80 110 -1 120 -1 -1 90 -1 -1 40 100 -1 -1 -1
+        return commonAncestorIndexP1+commonAncestorIndexP2;
+    } 
+    
+    public static void levelOrderLineWise(Node root){
+        Queue<Node> line = new LinkedList<>();
+        Queue<Node> children = new LinkedList<>();
+        line.add(root);
+        while(line.size()!=0){
+            for(Node a : line){
+                System.out.print(a.value+" ");
+                for(Node b : a.children)
+                    children.add(b);
+            }
+            line = children;
+            children = new LinkedList<>();
+            System.out.println();
+        }
+    }
+    
+    public static void main(String args[]) {
+        ArrayList<Integer> nodes = new ArrayList<>();
+        Scanner sc = new Scanner(System.in);
+        while(true){
+            try{
+                nodes.add(sc.nextInt());
+            }catch(Exception e){
+                break;
+            }
+        }
+        build(nodes);
+        levelOrderLineWise(root);
+        System.out.println(distanceBetweenNode(root,70,110));
+    }
+    
+}
